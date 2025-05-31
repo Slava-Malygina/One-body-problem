@@ -1,0 +1,1299 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор КБЖУ</title>
+    <style>
+        :root {
+            --primary-color: #4285f4;
+            --success-color: #34a853;
+            --danger-color: #ea4335;
+            --warning-color: #fbbc05;
+            --light-gray: #f8f9fa;
+            --dark-gray: #343a40;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #fff;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--dark-gray);
+        }
+
+        .search-container {
+            margin-bottom: 25px;
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+            .input-row input {
+                flex: 1;
+                padding: 12px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 16px;
+                transition: border-color 0.3s;
+            }
+
+                .input-row input:focus {
+                    border-color: var(--primary-color);
+                    outline: none;
+                    box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+                }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+        }
+
+            .button-row button {
+                flex: 1;
+                padding: 12px;
+                color: #fff;
+                border: none;
+                border-radius: 6px;
+                cursor: pointer;
+                font-size: 16px;
+                font-weight: 600;
+                transition: all 0.3s;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 8px;
+            }
+
+                .button-row button:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                }
+
+                .button-row button:active {
+                    transform: translateY(0);
+                }
+
+        #addProductBtn {
+            background-color: var(--success-color);
+        }
+
+        #addNewProductBtn {
+            background-color: var(--primary-color);
+        }
+
+        #addProductBtn:hover {
+            background-color: #2d9244;
+        }
+
+        #addNewProductBtn:hover {
+            background-color: #3a7bd5;
+        }
+
+        .table-container {
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: var(--light-gray);
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .delete-btn {
+            color: var(--danger-color);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.2s;
+        }
+
+            .delete-btn:hover {
+                transform: scale(1.2);
+            }
+
+        .total {
+            text-align: center;
+            margin-bottom: 25px;
+            background-color: var(--light-gray);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+            .total h2 {
+                margin-top: 0;
+                color: var(--dark-gray);
+            }
+
+        .total-table {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+            border-collapse: collapse;
+        }
+
+            .total-table th {
+                background-color: var(--primary-color);
+                color: white;
+            }
+
+            .total-table td {
+                font-weight: 600;
+            }
+
+        .progress-container {
+            margin-top: 25px;
+        }
+
+        .progress-item {
+            margin-bottom: 20px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+            .progress-header strong {
+                font-size: 16px;
+            }
+
+        .progress-bar {
+            height: 24px;
+            background-color: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease-out;
+            border-radius: 12px;
+        }
+
+        #caloriesProgress {
+            background-color: var(--primary-color);
+        }
+
+        #proteinsProgress {
+            background-color: var(--success-color);
+        }
+
+        #fatsProgress {
+            background-color: var(--warning-color);
+        }
+
+        #carbsProgress {
+            background-color: var(--danger-color);
+        }
+
+        .progress-label {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            line-height: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+        }
+
+        .exceeded {
+            color: var(--danger-color);
+            font-weight: bold;
+            font-size: 14px;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(3px);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 25px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            color: var(--dark-gray);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+            .modal-content input:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+                outline: none;
+            }
+
+        .modal-content button {
+            margin-top: 20px;
+            padding: 12px;
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+            .modal-content button:hover {
+                background-color: #2d9244;
+            }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+            .close:hover {
+                color: #333;
+            }
+
+        .calories-display {
+            padding: 10px;
+            background-color: var(--light-gray);
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-top: 5px;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .settings-panel, .activity-panel {
+            background-color: var(--light-gray);
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .settings-header, .activity-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 6px;
+            transition: background-color 0.3s;
+        }
+
+            .settings-header:hover, .activity-header:hover {
+                background-color: rgba(0,0,0,0.05);
+            }
+
+            .settings-header h2, .activity-header h2 {
+                margin: 0;
+                color: var(--dark-gray);
+                font-size: 18px;
+            }
+
+        .settings-content, .activity-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .settings-row, .activity-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+            .settings-row input, .activity-row input {
+                flex: 1;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                font-size: 16px;
+            }
+
+            .settings-row label, .activity-row label {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                font-weight: 600;
+                color: var(--dark-gray);
+            }
+
+        .activity-item {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: center;
+            padding: 10px;
+            background-color: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+            .activity-item input {
+                flex: 1;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+
+            .activity-item button {
+                padding: 8px 15px;
+                background-color: var(--danger-color);
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+
+                .activity-item button:hover {
+                    background-color: #c82333;
+                }
+
+        .add-activity-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+            .add-activity-btn:hover {
+                background-color: #3a7bd5;
+            }
+
+        .arrow {
+            transition: transform 0.3s;
+        }
+
+        .rotate {
+            transform: rotate(180deg);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 30px;
+            color: #6c757d;
+        }
+
+            .empty-state img {
+                width: 100px;
+                opacity: 0.7;
+                margin-bottom: 15px;
+            }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(200%);
+            transition: transform 0.3s ease-out;
+        }
+
+            .notification.show {
+                transform: translateX(0);
+            }
+
+            .notification.error {
+                background-color: var(--danger-color);
+            }
+
+            .notification.warning {
+                background-color: var(--warning-color);
+            }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+
+            .input-row {
+                flex-direction: column;
+            }
+
+            .button-row {
+                flex-direction: column;
+            }
+
+            .settings-row, .activity-row {
+                flex-direction: column;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 20px auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Калькулятор КБЖУ</h1>
+
+        <!-- Панель настроек лимитов КБЖУ -->
+        <div class="settings-panel">
+            <div class="settings-header" onclick="toggleSettings()">
+                <h2>Настройки лимитов КБЖУ</h2>
+                <span id="settingsArrow" class="arrow">▼</span>
+            </div>
+            <div class="settings-content" id="settingsContent">
+                <div class="settings-row">
+                    <label>
+                        Калории (ккал):
+                        <input type="number" id="caloriesLimit" placeholder="Лимит калорий" min="0">
+                    </label>
+                    <label>
+                        Белки (г):
+                        <input type="number" id="proteinsLimit" placeholder="Лимит белков" min="0" step="0.1">
+                    </label>
+                </div>
+                <div class="settings-row">
+                    <label>
+                        Жиры (г):
+                        <input type="number" id="fatsLimit" placeholder="Лимит жиров" min="0" step="0.1">
+                    </label>
+                    <label>
+                        Углеводы (г):
+                        <input type="number" id="carbsLimit" placeholder="Лимит углеводов" min="0" step="0.1">
+                    </label>
+                </div>
+                <button id="saveSettingsBtn" class="add-activity-btn">Сохранить настройки</button>
+            </div>
+        </div>
+
+        <!-- Панель учета физической активности -->
+        <div class="activity-panel">
+            <div class="activity-header" onclick="toggleActivity()">
+                <h2>Учет физической активности</h2>
+                <span id="activityArrow" class="arrow">▼</span>
+            </div>
+            <div class="activity-content" id="activityContent">
+                <div class="activity-row">
+                    <label>
+                        Вид активности:
+                        <input type="text" id="activityName" placeholder="Например: Бег">
+                    </label>
+                    <label>
+                        Сожжено калорий:
+                        <input type="number" id="activityCalories" placeholder="Ккал" min="0">
+                    </label>
+                </div>
+                <button id="addActivityBtn" class="add-activity-btn">Добавить активность</button>
+                <div id="activitiesList">
+                    <!-- Список активностей будет добавляться здесь -->
+                    <div class="empty-state" id="emptyActivities" style="display: none;">
+                        <p>Нет добавленных активностей</p>
+                    </div>
+                </div>
+                <div class="total">
+                    <strong>Всего сожжено: <span id="totalBurnedCalories">0</span> ккал</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <div class="input-row">
+                <input type="text" id="searchInput" placeholder="Поиск продукта..." list="productsList">
+                <datalist id="productsList"></datalist>
+                <input type="number" id="weightInput" placeholder="Вес (г)" min="1" value="100">
+            </div>
+            <div class="button-row">
+                <button id="addProductBtn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                    </svg>
+                    Добавить продукт
+                </button>
+                <button id="addNewProductBtn" style="display: none;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                    </svg>
+                    Добавить новый продукт
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table id="consumedProductsTable">
+                <thead>
+                    <tr>
+                        <th>Название</th>
+                        <th>Кал.</th>
+                        <th>Белки</th>
+                        <th>Жиры</th>
+                        <th>Угл.</th>
+                        <th>Вес (г)</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr id="emptyTableRow">
+                        <td colspan="7" class="empty-state">
+                            <p>Нет добавленных продуктов</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="total">
+            <h2>Итого (с учетом активности):</h2>
+            <table class="total-table">
+                <tr>
+                    <th>Кал.</th>
+                    <th>Белки</th>
+                    <th>Жиры</th>
+                    <th>Угл.</th>
+                </tr>
+                <tr>
+                    <td><span id="totalCalories">0</span> ккал</td>
+                    <td><span id="totalProteins">0</span> г</td>
+                    <td><span id="totalFats">0</span> г</td>
+                    <td><span id="totalCarbs">0</span> г</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-item">
+                <div class="progress-header">
+                    <strong>Калории:</strong>
+                    <span id="caloriesValue">0/0 ккал</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="caloriesProgress"></div>
+                    <div class="progress-label" id="caloriesLabel">0%</div>
+                </div>
+                <div id="caloriesExceeded" class="exceeded" style="display: none;">Превышено на <span id="caloriesOver">0</span> ккал</div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-header">
+                    <strong>Белки:</strong>
+                    <span id="proteinsValue">0/0 г</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="proteinsProgress"></div>
+                    <div class="progress-label" id="proteinsLabel">0%</div>
+                </div>
+                <div id="proteinsExceeded" class="exceeded" style="display: none;">Превышено на <span id="proteinsOver">0</span> г</div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-header">
+                    <strong>Жиры:</strong>
+                    <span id="fatsValue">0/0 г</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="fatsProgress"></div>
+                    <div class="progress-label" id="fatsLabel">0%</div>
+                </div>
+                <div id="fatsExceeded" class="exceeded" style="display: none;">Превышено на <span id="fatsOver">0</span> г</div>
+            </div>
+            <div class="progress-item">
+                <div class="progress-header">
+                    <strong>Углеводы:</strong>
+                    <span id="carbsValue">0/0 г</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="carbsProgress"></div>
+                    <div class="progress-label" id="carbsLabel">0%</div>
+                </div>
+                <div id="carbsExceeded" class="exceeded" style="display: none;">Превышено на <span id="carbsOver">0</span> г</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для добавления нового продукта -->
+    <div id="newProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Добавить новый продукт</h2>
+            <form id="newProductForm">
+                <label for="newProductName">Название:</label>
+                <input type="text" id="newProductName" required>
+
+                <label for="newProductProteins">Белки (на 100 г):</label>
+                <input type="number" step="0.1" id="newProductProteins" min="0" required>
+
+                <label for="newProductFats">Жиры (на 100 г):</label>
+                <input type="number" step="0.1" id="newProductFats" min="0" required>
+
+                <label for="newProductCarbs">Углеводы (на 100 г):</label>
+                <input type="number" step="0.1" id="newProductCarbs" min="0" required>
+
+                <label>Калории (на 100 г):</label>
+                <div class="calories-display" id="calculatedCalories">0 ккал</div>
+
+                <button type="submit">Добавить продукт</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Уведомление -->
+    <div id="notification" class="notification">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+        </svg>
+        <span id="notificationText">Уведомление</span>
+    </div>
+
+    <script>
+        // База данных продуктов
+        let productsDatabase = [
+            { name: "Яблоко", proteins: 0.4, fats: 0.4, carbs: 11.8 },
+            { name: "Куриная грудка", proteins: 23.6, fats: 1.9, carbs: 0.4 },
+            { name: "Рис вареный", proteins: 2.7, fats: 0.3, carbs: 28.2 },
+            { name: "Овсянка", proteins: 13.2, fats: 6.5, carbs: 67.5 },
+            { name: "Яйцо куриное", proteins: 12.7, fats: 11.5, carbs: 0.7 },
+            { name: "Творог 5%", proteins: 16.0, fats: 5.0, carbs: 3.0 },
+            { name: "Гречка", proteins: 12.6, fats: 3.3, carbs: 62.1 },
+            { name: "Банан", proteins: 1.5, fats: 0.2, carbs: 21.8 },
+            { name: "Лосось", proteins: 20.0, fats: 13.0, carbs: 0.0 },
+            { name: "Картофель вареный", proteins: 2.0, fats: 0.4, carbs: 16.7 }
+        ];
+
+        // Потребленные продукты
+        let consumedProducts = [];
+
+        // Физическая активность
+        let activities = [];
+
+        // Лимиты КБЖУ
+        let limits = {
+            calories: 2000,
+            proteins: 150,
+            fats: 67,
+            carbs: 75
+        };
+
+        // DOM элементы
+        const searchInput = document.getElementById('searchInput');
+        const weightInput = document.getElementById('weightInput');
+        const addProductBtn = document.getElementById('addProductBtn');
+        const addNewProductBtn = document.getElementById('addNewProductBtn');
+        const productsList = document.getElementById('productsList');
+        const consumedProductsTable = document.getElementById('consumedProductsTable').getElementsByTagName('tbody')[0];
+        const emptyTableRow = document.getElementById('emptyTableRow');
+
+        // Итоговые значения
+        const totalCaloriesElement = document.getElementById('totalCalories');
+        const totalProteinsElement = document.getElementById('totalProteins');
+        const totalFatsElement = document.getElementById('totalFats');
+        const totalCarbsElement = document.getElementById('totalCarbs');
+
+        // Прогресс-бары
+        const caloriesProgress = document.getElementById('caloriesProgress');
+        const proteinsProgress = document.getElementById('proteinsProgress');
+        const fatsProgress = document.getElementById('fatsProgress');
+        const carbsProgress = document.getElementById('carbsProgress');
+
+        // Значения прогресса
+        const caloriesValue = document.getElementById('caloriesValue');
+        const proteinsValue = document.getElementById('proteinsValue');
+        const fatsValue = document.getElementById('fatsValue');
+        const carbsValue = document.getElementById('carbsValue');
+
+        // Проценты прогресса
+        const caloriesLabel = document.getElementById('caloriesLabel');
+        const proteinsLabel = document.getElementById('proteinsLabel');
+        const fatsLabel = document.getElementById('fatsLabel');
+        const carbsLabel = document.getElementById('carbsLabel');
+
+        // Превышение лимитов
+        const caloriesExceeded = document.getElementById('caloriesExceeded');
+        const proteinsExceeded = document.getElementById('proteinsExceeded');
+        const fatsExceeded = document.getElementById('fatsExceeded');
+        const carbsExceeded = document.getElementById('carbsExceeded');
+
+        const caloriesOver = document.getElementById('caloriesOver');
+        const proteinsOver = document.getElementById('proteinsOver');
+        const fatsOver = document.getElementById('fatsOver');
+        const carbsOver = document.getElementById('carbsOver');
+
+        // Модальное окно
+        const modal = document.getElementById('newProductModal');
+        const closeBtn = document.querySelector('.close');
+        const newProductForm = document.getElementById('newProductForm');
+        const calculatedCalories = document.getElementById('calculatedCalories');
+
+        // Настройки
+        const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+        const caloriesLimitInput = document.getElementById('caloriesLimit');
+        const proteinsLimitInput = document.getElementById('proteinsLimit');
+        const fatsLimitInput = document.getElementById('fatsLimit');
+        const carbsLimitInput = document.getElementById('carbsLimit');
+
+        // Активность
+        const addActivityBtn = document.getElementById('addActivityBtn');
+        const activityNameInput = document.getElementById('activityName');
+        const activityCaloriesInput = document.getElementById('activityCalories');
+        const activitiesList = document.getElementById('activitiesList');
+        const totalBurnedCaloriesElement = document.getElementById('totalBurnedCalories');
+        const emptyActivities = document.getElementById('emptyActivities');
+
+        // Уведомления
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notificationText');
+
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function () {
+            // Загрузка данных из localStorage
+            loadFromLocalStorage();
+
+            // Заполнение datalist
+            updateProductsList();
+
+            // Обновление таблицы
+            updateConsumedProductsTable();
+
+            // Обновление итоговых значений
+            updateTotals();
+
+            // Обновление прогресс-баров
+            updateProgressBars();
+
+            // Установка лимитов в форму
+            setLimitsToForm();
+
+            // События для модального окна
+            closeBtn.addEventListener('click', closeModal);
+            window.addEventListener('click', function (event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Событие для формы нового продукта
+            newProductForm.addEventListener('input', calculateCaloriesFromMacros);
+
+            // Событие для кнопки добавления продукта
+            addProductBtn.addEventListener('click', addProduct);
+
+            // Событие для кнопки добавления нового продукта
+            addNewProductBtn.addEventListener('click', showNewProductModal);
+
+            // Событие для сохранения настроек
+            saveSettingsBtn.addEventListener('click', saveSettings);
+
+            // Событие для добавления активности
+            addActivityBtn.addEventListener('click', addActivity);
+
+            // Событие для поиска продукта
+            searchInput.addEventListener('input', function () {
+                const searchTerm = this.value.toLowerCase();
+                const foundProduct = productsDatabase.find(product =>
+                    product.name.toLowerCase() === searchTerm
+                );
+
+                addNewProductBtn.style.display = foundProduct ? 'none' : 'flex';
+            });
+
+            // Показать пустое состояние для активностей, если их нет
+            if (activities.length === 0) {
+                emptyActivities.style.display = 'block';
+            }
+        });
+
+        // Функции
+        function loadFromLocalStorage() {
+            const savedProducts = localStorage.getItem('consumedProducts');
+            const savedActivities = localStorage.getItem('activities');
+            const savedLimits = localStorage.getItem('limits');
+
+            if (savedProducts) {
+                consumedProducts = JSON.parse(savedProducts);
+            }
+
+            if (savedActivities) {
+                activities = JSON.parse(savedActivities);
+                updateActivitiesList();
+            }
+
+            if (savedLimits) {
+                limits = JSON.parse(savedLimits);
+            }
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('consumedProducts', JSON.stringify(consumedProducts));
+            localStorage.setItem('activities', JSON.stringify(activities));
+            localStorage.setItem('limits', JSON.stringify(limits));
+        }
+
+        function updateProductsList() {
+            productsList.innerHTML = '';
+            productsDatabase.forEach(product => {
+                const option = document.createElement('option');
+                option.value = product.name;
+                productsList.appendChild(option);
+            });
+        }
+
+        function addProduct() {
+            const productName = searchInput.value.trim();
+            const weight = parseFloat(weightInput.value) || 100;
+
+            if (!productName) {
+                showNotification('Введите название продукта', 'error');
+                return;
+            }
+
+            const foundProduct = productsDatabase.find(product =>
+                product.name.toLowerCase() === productName.toLowerCase()
+            );
+
+            if (foundProduct) {
+                const productToAdd = {
+                    ...foundProduct,
+                    weight: weight
+                };
+
+                consumedProducts.push(productToAdd);
+                saveToLocalStorage();
+                updateConsumedProductsTable();
+                updateTotals();
+                updateProgressBars();
+
+                searchInput.value = '';
+                weightInput.value = '100';
+
+                showNotification('Продукт добавлен');
+            } else {
+                showNotification('Продукт не найден', 'warning');
+                addNewProductBtn.style.display = 'flex';
+            }
+        }
+
+        function showNewProductModal() {
+            const productName = searchInput.value.trim();
+            document.getElementById('newProductName').value = productName;
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+            newProductForm.reset();
+            calculatedCalories.textContent = '0 ккал';
+        }
+
+        function calculateCaloriesFromMacros() {
+            const proteins = parseFloat(document.getElementById('newProductProteins').value) || 0;
+            const fats = parseFloat(document.getElementById('newProductFats').value) || 0;
+            const carbs = parseFloat(document.getElementById('newProductCarbs').value) || 0;
+
+            // Формула расчета калорий: 4 ккал/г для белков и углеводов, 9 ккал/г для жиров
+            const calories = proteins * 4 + fats * 9 + carbs * 4;
+            calculatedCalories.textContent = `${calories.toFixed(1)} ккал`;
+        }
+
+        function addNewProduct(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('newProductName').value.trim();
+            const proteins = parseFloat(document.getElementById('newProductProteins').value) || 0;
+            const fats = parseFloat(document.getElementById('newProductFats').value) || 0;
+            const carbs = parseFloat(document.getElementById('newProductCarbs').value) || 0;
+
+            if (!name) {
+                showNotification('Введите название продукта', 'error');
+                return;
+            }
+
+            const newProduct = {
+                name: name,
+                proteins: proteins,
+                fats: fats,
+                carbs: carbs
+            };
+
+            productsDatabase.push(newProduct);
+            updateProductsList();
+
+            // Добавляем новый продукт в потребленные
+            const weight = parseFloat(weightInput.value) || 100;
+            const productToAdd = {
+                ...newProduct,
+                weight: weight
+            };
+
+            consumedProducts.push(productToAdd);
+            saveToLocalStorage();
+            updateConsumedProductsTable();
+            updateTotals();
+            updateProgressBars();
+
+            closeModal();
+            searchInput.value = '';
+            weightInput.value = '100';
+
+            showNotification('Новый продукт добавлен');
+        }
+
+        newProductForm.addEventListener('submit', addNewProduct);
+
+        function updateConsumedProductsTable() {
+            consumedProductsTable.innerHTML = '';
+
+            if (consumedProducts.length === 0) {
+                consumedProductsTable.appendChild(emptyTableRow);
+                return;
+            }
+
+            consumedProducts.forEach((product, index) => {
+                const row = document.createElement('tr');
+
+                // Расчет значений для указанного веса
+                const weightCoefficient = product.weight / 100;
+                const calories = (product.proteins * 4 + product.fats * 9 + product.carbs * 4) * weightCoefficient;
+                const proteins = product.proteins * weightCoefficient;
+                const fats = product.fats * weightCoefficient;
+                const carbs = product.carbs * weightCoefficient;
+
+                row.innerHTML = `
+                            <td>${product.name}</td>
+                            <td>${calories.toFixed(1)}</td>
+                            <td>${proteins.toFixed(1)}</td>
+                            <td>${fats.toFixed(1)}</td>
+                            <td>${carbs.toFixed(1)}</td>
+                            <td>${product.weight}</td>
+                            <td><button class="delete-btn" onclick="removeProduct(${index})">×</button></td>
+                        `;
+
+                consumedProductsTable.appendChild(row);
+            });
+        }
+
+        function removeProduct(index) {
+            consumedProducts.splice(index, 1);
+            saveToLocalStorage();
+            updateConsumedProductsTable();
+            updateTotals();
+            updateProgressBars();
+
+            showNotification('Продукт удален');
+        }
+
+        function calculateTotals() {
+            let totalCalories = 0;
+            let totalProteins = 0;
+            let totalFats = 0;
+            let totalCarbs = 0;
+
+            consumedProducts.forEach(product => {
+                const weightCoefficient = product.weight / 100;
+                totalProteins += product.proteins * weightCoefficient;
+                totalFats += product.fats * weightCoefficient;
+                totalCarbs += product.carbs * weightCoefficient;
+            });
+
+            // Расчет калорий из БЖУ
+            totalCalories = totalProteins * 4 + totalFats * 9 + totalCarbs * 4;
+
+            // Учет физической активности (вычитаем сожженные калории)
+            const totalBurnedCalories = activities.reduce((sum, activity) => sum + activity.calories, 0);
+            const netCalories = totalCalories - totalBurnedCalories;
+
+            return {
+                calories: netCalories > 0 ? netCalories : 0,
+                proteins: totalProteins,
+                fats: totalFats,
+                carbs: totalCarbs,
+                burned: totalBurnedCalories
+            };
+        }
+
+        function updateTotals() {
+            const totals = calculateTotals();
+
+            totalCaloriesElement.textContent = totals.calories.toFixed(1);
+            totalProteinsElement.textContent = totals.proteins.toFixed(1);
+            totalFatsElement.textContent = totals.fats.toFixed(1);
+            totalCarbsElement.textContent = totals.carbs.toFixed(1);
+            totalBurnedCaloriesElement.textContent = totals.burned.toFixed(1);
+        }
+
+        function updateProgressBars() {
+            const totals = calculateTotals();
+
+            // Обновление значений прогресса
+            caloriesValue.textContent = `${totals.calories.toFixed(1)}/${limits.calories} ккал`;
+            proteinsValue.textContent = `${totals.proteins.toFixed(1)}/${limits.proteins} г`;
+            fatsValue.textContent = `${totals.fats.toFixed(1)}/${limits.fats} г`;
+            carbsValue.textContent = `${totals.carbs.toFixed(1)}/${limits.carbs} г`;
+
+            // Расчет процентов
+            const caloriesPercent = Math.min((totals.calories / limits.calories) * 100, 100);
+            const proteinsPercent = Math.min((totals.proteins / limits.proteins) * 100, 100);
+            const fatsPercent = Math.min((totals.fats / limits.fats) * 100, 100);
+            const carbsPercent = Math.min((totals.carbs / limits.carbs) * 100, 100);
+
+            // Обновление прогресс-баров
+            caloriesProgress.style.width = `${caloriesPercent}%`;
+            proteinsProgress.style.width = `${proteinsPercent}%`;
+            fatsProgress.style.width = `${fatsPercent}%`;
+            carbsProgress.style.width = `${carbsPercent}%`;
+
+            // Обновление меток
+            caloriesLabel.textContent = `${caloriesPercent.toFixed(1)}%`;
+            proteinsLabel.textContent = `${proteinsPercent.toFixed(1)}%`;
+            fatsLabel.textContent = `${fatsPercent.toFixed(1)}%`;
+            carbsLabel.textContent = `${carbsPercent.toFixed(1)}%`;
+
+            // Проверка на превышение лимитов
+            updateExceededIndicator(caloriesExceeded, caloriesOver, totals.calories, limits.calories);
+            updateExceededIndicator(proteinsExceeded, proteinsOver, totals.proteins, limits.proteins);
+            updateExceededIndicator(fatsExceeded, fatsOver, totals.fats, limits.fats);
+            updateExceededIndicator(carbsExceeded, carbsOver, totals.carbs, limits.carbs);
+        }
+
+        function updateExceededIndicator(element, valueElement, current, limit) {
+            if (current > limit) {
+                element.style.display = 'block';
+                valueElement.textContent = (current - limit).toFixed(1);
+            } else {
+                element.style.display = 'none';
+            }
+        }
+
+        function toggleSettings() {
+            const content = document.getElementById('settingsContent');
+            const arrow = document.getElementById('settingsArrow');
+
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                arrow.classList.remove('rotate');
+            } else {
+                content.style.display = 'block';
+                arrow.classList.add('rotate');
+            }
+        }
+
+        function toggleActivity() {
+            const content = document.getElementById('activityContent');
+            const arrow = document.getElementById('activityArrow');
+
+            if (content.style.display === 'block') {
+                content.style.display = 'none';
+                arrow.classList.remove('rotate');
+            } else {
+                content.style.display = 'block';
+                arrow.classList.add('rotate');
+            }
+        }
+
+        function setLimitsToForm() {
+            caloriesLimitInput.value = limits.calories;
+            proteinsLimitInput.value = limits.proteins;
+            fatsLimitInput.value = limits.fats;
+            carbsLimitInput.value = limits.carbs;
+        }
+
+        function saveSettings() {
+            limits.calories = parseFloat(caloriesLimitInput.value) || 2000;
+            limits.proteins = parseFloat(proteinsLimitInput.value) || 150;
+            limits.fats = parseFloat(fatsLimitInput.value) || 67;
+            limits.carbs = parseFloat(carbsLimitInput.value) || 75;
+
+            saveToLocalStorage();
+            updateProgressBars();
+
+            showNotification('Настройки сохранены');
+        }
+
+        function addActivity() {
+            const name = activityNameInput.value.trim();
+            const calories = parseFloat(activityCaloriesInput.value);
+
+            if (!name || isNaN(calories) || calories <= 0) {
+                showNotification('Заполните все поля корректно', 'error');
+                return;
+            }
+
+            activities.push({
+                name: name,
+                calories: calories,
+                date: new Date().toLocaleString()
+            });
+
+            saveToLocalStorage();
+            updateActivitiesList();
+            updateTotals();
+            updateProgressBars();
+
+            activityNameInput.value = '';
+            activityCaloriesInput.value = '';
+
+            showNotification('Активность добавлена');
+        }
+
+        function updateActivitiesList() {
+            activitiesList.innerHTML = '';
+
+            if (activities.length === 0) {
+                emptyActivities.style.display = 'block';
+                return;
+            }
+
+            emptyActivities.style.display = 'none';
+
+            activities.forEach((activity, index) => {
+                const activityElement = document.createElement('div');
+                activityElement.className = 'activity-item';
+                activityElement.innerHTML = `
+                            <input type="text" value="${activity.name}" readonly>
+                            <input type="number" value="${activity.calories}" readonly>
+                            <button onclick="removeActivity(${index})">Удалить</button>
+                        `;
+                activitiesList.appendChild(activityElement);
+            });
+        }
+
+        function removeActivity(index) {
+            activities.splice(index, 1);
+            saveToLocalStorage();
+            updateActivitiesList();
+            updateTotals();
+            updateProgressBars();
+
+            showNotification('Активность удалена');
+        }
+
+        function showNotification(message, type = 'success') {
+            notificationText.textContent = message;
+            notification.className = 'notification';
+            notification.classList.add(type);
+            notification.classList.add('show');
+
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
